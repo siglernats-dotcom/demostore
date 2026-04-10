@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUXE & CO. | Tienda Oficial</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .serif { font-family: 'Playfair Display', serif; }
+        .cart-drawer { transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1); transform: translateX(100%); }
+        .cart-drawer.open { transform: translateX(0); }
+        .glass { background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px); }
+        
+        .btn-add {
+            transition: all 0.3s ease;
+            background: #000;
+            color: #fff;
+        }
+        .btn-add:hover {
+            background: #333;
+            letter-spacing: 1px;
+        }
+
+        .category-pill.active {
+            background-color: black;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-white text-gray-900 flex flex-col min-h-screen">
+
+    <div class="bg-black text-white text-[10px] uppercase tracking-[0.2em] py-2 text-center font-bold">
+        Envío Express de cortesía en pedidos superiores a $3,000 MXN
+    </div>
+
+    <header class="sticky top-0 z-40 glass border-b border-gray-100">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="text-2xl serif tracking-tighter text-black">LUXE & CO.</div>
+            <div class="hidden md:flex gap-8 text-[11px] uppercase tracking-widest font-semibold">
+                <a href="#" class="hover:text-gray-500">Colecciones</a>
+                <a href="#" class="hover:text-gray-500">Best Sellers</a>
+                <a href="#" class="hover:text-gray-500">Nosotros</a>
+            </div>
+            <button onclick="toggleCart()" class="relative p-2">
+                <i class="fa-solid fa-bag-shopping text-xl"></i>
+                <span id="cart-count" class="absolute top-0 right-0 bg-black text-white text-[9px] w-5 h-5 flex items-center justify-center rounded-full font-bold">0</span>
+            </button>
+        </div>
+    </header>
+
+    <section class="relative h-[60vh] bg-gray-900 flex items-center justify-center overflow-hidden">
+        <img src="https://images.pexels.com/photos/1884581/pexels-photo-1884581.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=2" 
+             class="absolute inset-0 w-full h-full object-cover opacity-60" alt="Hero">
+        <div class="relative text-center text-white px-6">
+            <h1 class="serif text-5xl md:text-7xl mb-4 tracking-tight">Elegancia Atemporal</h1>
+            <p class="text-sm md:text-lg uppercase tracking-[0.3em] font-light">Colección Primavera / Verano 2026</p>
+        </div>
+    </section>
+
+    <section class="container mx-auto px-6 pt-16 text-center">
+        <div class="max-w-2xl mx-auto">
+            <h2 class="serif text-3xl mb-4">Curaduría Exclusiva</h2>
+            <p class="text-gray-500 text-sm leading-relaxed mb-10">
+                Piezas diseñadas para la mujer contemporánea que valora la sofisticación y el detalle. 
+                Nuestra selección Luxe combina materiales nobles con cortes minimalistas para elevar tu estilo diario.
+            </p>
+        </div>
+
+        <div class="flex flex-wrap justify-center gap-4 mb-12">
+            <button onclick="filterProducts('all')" class="category-pill border border-black px-6 py-2 text-[10px] uppercase tracking-widest font-bold hover:bg-black hover:text-white transition active">Todos</button>
+            <button onclick="filterProducts('bolsos')" class="category-pill border border-gray-200 px-6 py-2 text-[10px] uppercase tracking-widest font-bold hover:border-black transition">Bolsos</button>
+            <button onclick="filterProducts('ropa')" class="category-pill border border-gray-200 px-6 py-2 text-[10px] uppercase tracking-widest font-bold hover:border-black transition">Ropa</button>
+            <button onclick="filterProducts('accesorios')" class="category-pill border border-gray-200 px-6 py-2 text-[10px] uppercase tracking-widest font-bold hover:border-black transition">Accesorios</button>
+        </div>
+    </section>
+
+    <main class="flex-grow container mx-auto px-6 pb-24">
+        <div id="grid-productos" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+        </div>
+    </main>
+
+    <footer class="bg-gray-50 border-t border-gray-100 py-12 text-center">
+        <div class="text-xl serif mb-6">LUXE & CO.</div>
+        <p class="text-[10px] text-gray-400 uppercase tracking-[0.3em] font-bold">© 2026 LUXE & CO. | Powered by E90+</p>
+    </footer>
+
+    <div id="cart-drawer" class="cart-drawer fixed top-0 right-0 h-full w-full max-w-md bg-white z-50 shadow-2xl flex flex-col">
+        <div class="p-6 border-b flex justify-between items-center bg-gray-50">
+            <h2 class="serif text-xl">Tu Carrito</h2>
+            <button onclick="toggleCart()" class="text-3xl">&times;</button>
+        </div>
+        
+        <div class="p-6 bg-white border-b">
+            <label class="text-[10px] font-bold uppercase tracking-widest text-gray-400 block mb-2">Nombre del Cliente</label>
+            <input type="text" id="client-name" placeholder="Escribe tu nombre aquí..." class="w-full border border-gray-200 p-3 rounded-md outline-none focus:border-black transition text-sm">
+        </div>
+
+        <div id="cart-items" class="flex-grow p-6 overflow-y-auto space-y-4"></div>
+
+        <div class="p-6 border-t bg-gray-50 space-y-4">
+            <div class="flex justify-between items-center font-bold text-lg">
+                <span class="text-gray-500 text-sm uppercase tracking-widest">Total Estimado</span>
+                <span id="cart-total" class="text-black">$0.00</span>
+            </div>
+            <button onclick="sendToWhatsApp()" class="w-full bg-[#25d366] text-white py-4 font-bold uppercase tracking-[2px] text-xs flex items-center justify-center gap-3 hover:bg-green-600 transition shadow-xl rounded-sm">
+                <i class="fab fa-whatsapp text-lg"></i> Confirmar por WhatsApp
+            </button>
+        </div>
+    </div>
+
+    <div id="cart-overlay" onclick="toggleCart()" class="fixed inset-0 bg-black/40 z-40 hidden"></div>
+
+    <script>
+        const phone = "525551031461";
+        let cart = [];
+
+        const productos = [
+            { id: 1, category: 'bolsos', name: "Bolsa de Mano 'Nuit'", price: 2499, img: "https://images.pexels.com/photos/1152077/pexels-photo-1152077.jpeg?auto=compress&w=400" },
+            { id: 2, category: 'ropa', name: "Abrigo de Lana Minimal", price: 4800, img: "https://images.pexels.com/photos/842811/pexels-photo-842811.jpeg?auto=compress&w=400" },
+            { id: 3, category: 'bolsos', name: "Tote Bag 'Desert'", price: 1520, img: "https://images.pexels.com/photos/904350/pexels-photo-904350.jpeg?auto=compress&w=400" },
+            { id: 4, category: 'ropa', name: "Conjunto Sastre Avellana", price: 3200, img: "https://images.pexels.com/photos/2065195/pexels-photo-2065195.jpeg?auto=compress&w=400" },
+            { id: 5, category: 'ropa', name: "Blusa Crema Silk", price: 1250, img: "https://images.pexels.com/photos/1926769/pexels-photo-1926769.jpeg?auto=compress&w=400" },
+            { id: 6, category: 'bolsos', name: "Bolso Estructurado Noir", price: 2900, img: "https://images.pexels.com/photos/1462637/pexels-photo-1462637.jpeg?auto=compress&w=400" },
+            { id: 7, category: 'accesorios', name: "Sombrero Fieltro Elegance", price: 850, img: "https://images.pexels.com/photos/1126993/pexels-photo-1126993.jpeg?auto=compress&w=400" },
+            { id: 8, category: 'ropa', name: "Suéter Cashmere Gris", price: 2100, img: "https://images.pexels.com/photos/45982/pexels-photo-45982.jpeg?auto=compress&w=400" }
+        ];
+
+        function renderProducts(filter = 'all') {
+            const grid = document.getElementById('grid-productos');
+            grid.innerHTML = '';
+            
+            const filtered = filter === 'all' ? productos : productos.filter(p => p.category === filter);
+            
+            filtered.forEach((p) => {
+                const card = document.createElement('div');
+                card.className = "product-card flex flex-col group";
+                card.innerHTML = `
+                    <div class="relative overflow-hidden aspect-[3/4] bg-gray-100 rounded-sm">
+                        <img src="${p.img}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
+                    </div>
+                    <div class="mt-4 flex flex-col flex-grow">
+                        <h3 class="font-semibold text-[11px] uppercase tracking-[1.5px] text-gray-800">${p.name}</h3>
+                        <p class="text-gray-500 text-sm mt-1 font-light">$${p.price.toLocaleString()}.00</p>
+                        <button onclick="addToCartById(${p.id})" class="btn-add mt-4 py-3 text-[10px] font-bold uppercase tracking-widest rounded-sm">
+                            Agregar al carrito
+                        </button>
+                    </div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function filterProducts(cat) {
+            document.querySelectorAll('.category-pill').forEach(btn => {
+                btn.classList.remove('active', 'border-black');
+                btn.classList.add('border-gray-200');
+            });
+            event.target.classList.add('active', 'border-black');
+            renderProducts(cat);
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-drawer').classList.toggle('open');
+            document.getElementById('cart-overlay').classList.toggle('hidden');
+        }
+
+        function addToCartById(id) {
+            const product = productos.find(p => p.id === id);
+            cart.push(product);
+            updateUI();
+            if(!document.getElementById('cart-drawer').classList.contains('open')) toggleCart();
+        }
+
+        function removeItem(index) {
+            cart.splice(index, 1);
+            updateUI();
+        }
+
+        function updateUI() {
+            const container = document.getElementById('cart-items');
+            document.getElementById('cart-count').innerText = cart.length;
+            
+            if (cart.length === 0) {
+                container.innerHTML = '<div class="h-40 flex items-center justify-center text-gray-300 italic text-sm">Tu bolsa está vacía</div>';
+                document.getElementById('cart-total').innerText = "$0.00";
+                return;
+            }
+
+            let total = 0;
+            container.innerHTML = cart.map((item, i) => {
+                total += item.price;
+                return `
+                    <div class="flex justify-between items-center bg-gray-50 p-4 rounded-sm border border-gray-100">
+                        <div>
+                            <p class="font-bold text-[10px] uppercase tracking-widest text-black">${item.name}</p>
+                            <p class="text-xs text-gray-400 mt-1">$${item.price.toLocaleString()}</p>
+                        </div>
+                        <button onclick="removeItem(${i})" class="text-gray-400 hover:text-red-500 transition">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+            document.getElementById('cart-total').innerText = `$${total.toLocaleString()}.00`;
+        }
+
+        function sendToWhatsApp() {
+            const name = document.getElementById('client-name').value.trim();
+            if (!name) return alert("Por favor, ingresa tu nombre.");
+            if (cart.length === 0) return alert("El carrito está vacío.");
+
+            let msg = `*PEDIDO NUEVO - LUXE & CO.*\n\n`;
+            msg += `👤 *Cliente:* ${name}\n`;
+            msg += `───────────────\n`;
+            
+            let total = 0;
+            cart.forEach((item, i) => {
+                msg += `• ${item.name} ($${item.price.toLocaleString()})\n`;
+                total += item.price;
+            });
+
+            msg += `───────────────\n`;
+            msg += `💰 *TOTAL:* $${total.toLocaleString()} MXN\n\n`;
+            msg += `_Favor de confirmar existencia para proceder con el pago._`;
+
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+        }
+
+        // Inicializar
+        renderProducts();
+    </script>
+</body>
+</html>
